@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
 		# may well be where markers mark your assignment.
 		webserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
 		
-		#webserver.vm.provision "shell", path: "build-webserver-vm.sh"
+		webserver.vm.provision "shell", path: "build-webserver-vm.sh"
 	end
 	
 	
