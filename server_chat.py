@@ -1,0 +1,28 @@
+from flask import Flask, request, jsonify
+from transformers import pipeline, Conversation, logging
+logging.set_verbosity_error()
+
+app = Flask(__name__)
+
+elon = pipeline("conversational", model="Pi3141/DialoGPT-medium-elon-3")
+
+@app.route('/elon', methods=['POST'])
+def chat_elon():
+    user_input = request.json['user_input']
+    conversation = Conversation(user_input)
+    conversation = elon(conversation)
+    response = conversation.generated_responses[-1]
+    return jsonify({'response': response})
+
+sarcasm = pipeline("conversational", model="abhiramtirumala/DialoGPT-sarcastic")
+
+@app.route('/sarcasm', methods=['POST'])
+def chat_sarcasm():
+    user_input = request.json['user_input']
+    conversation = Conversation(user_input)
+    conversation = sarcasm(conversation)
+    response = conversation.generated_responses[-1]
+    return jsonify({'response': response})
+
+if __name__ == '__main__':
+    app.run(port=5000)
