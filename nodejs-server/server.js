@@ -1,54 +1,103 @@
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
+const express = require('express');
+const path = require('path');
+const mysql = require('mysql2');
+const axios = require('axios'); // Import axios
+const app = express();
 
-http.createServer(function (request, response) {
-    console.log('request ', request.url);
-    
-    var filePath = '.' + request.url;
-    if (filePath == './')
-        filePath = './index.html';
+// Serve static files
+app.use(express.static(path.join(__dirname)));
 
-    var extname = String(path.extname(filePath)).toLowerCase();
-    var mimeTypes = {
-        '.html': 'text/html',
-        '.js': 'text/javascript',
-        '.css': 'text/css',
-        '.json': 'application/json',
-        '.png': 'image/png',
-        '.jpg': 'image/jpg',
-        '.gif': 'image/gif',
-        '.svg': 'image/svg+xml',
-        '.wav': 'audio/wav',
-        '.mp4': 'video/mp4',
-        '.woff': 'application/font-woff',
-        '.ttf': 'application/font-ttf',
-        '.eot': 'application/vnd.ms-fontobject',
-        '.otf': 'application/font-otf',
-        '.wasm': 'application/wasm'
-    };
+// // Serve the index.html page
+// app.get('/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'index.html'));
+// });
 
-    var contentType = mimeTypes[extname] || 'application/octet-stream';
 
-    fs.readFile(filePath, function(error, content) {
-        if (error) {
-            if(error.code == 'ENOENT') {
-                fs.readFile('./404.html', function(error, content) {
-                    response.writeHead(200, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
-                });
+//  DB STUFF
+
+const dbConfig = {
+    host: '192.168.56.12',
+    user: 'webuser',
+    password: 'insecure_db_pw',
+    database: 'fvision'
+};
+
+let connection;
+
+// Function to create a connection with retries
+function createConnectionWithRetries() {
+    const maxRetries = 10;
+    const retryInterval = 5000; // 5 seconds
+
+    function attemptConnection(attempt) {
+        console.log(`Attempt ${attempt} to connect to the database...`);
+        connection = mysql.createConnection(dbConfig);
+
+        connection.connect(error => {
+            if (error) {
+                console.error(`Error connecting to the database: ${error.message}`);
+                if (attempt < maxRetries) {
+                    setTimeout(() => attemptConnection(attempt + 1), retryInterval);
+                } else {
+                    console.error('Could not connect to the database after multiple attempts.');
+                    process.exit(1); // Exit the application
+                }
+            } else {
+                console.log('Connected to the database successfully.');
+                startServer();
             }
-            else {
-                response.writeHead(500);
-                response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
-                response.end(); 
+        });
+    }
+
+    attemptConnection(1);
+}
+
+createConnectionWithRetries();
+
+function startServer() {
+
+
+    // Handle GET request
+    app.get('/messages', (req, res) => {
+        // Fetch messages from the database using the established connection
+        connection.query('SELECT * FROM messages', (error, results) => {
+            if (error) {
+                console.error(error);
+                res.status(500).send('Error fetching messages from the database.');
+            } else {
+                res.json(results);
             }
-        }
-        else {
-            response.writeHead(200, { 'Content-Type': contentType });
-            response.end(content, 'utf-8');
-        }
+        });
     });
 
-}).listen(8125);
-console.log('Server running at http://127.0.0.1:8125/');
+    app.post('/send-message', (req, res) => {
+        const messageData = req.body;
+        const query = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
+        const values = [messageData.name, messageData.message, messageData.time];
+
+        // Insert message into the database using the established connection
+        connection.query(query, values, (error, results) => {
+            if (error) {
+                console.error(error);
+                res.status(500).send('Error inserting message into the database.');
+            } else {
+                res.send('Message inserted successfully.');
+            }
+        });
+    });
+
+    /* reload messages every 2 seconds */
+    loadAllMessages();
+
+
+
+}
+
+
+const IP_ADDRESS = 'localhost'; // Change this to your desired IP address
+const PORT = 8080;
+app.listen(PORT, IP_ADDRESS, () => {
+    console.log(`Server running at http://${IP_ADDRESS}:${PORT}/`);
+});
+
+
