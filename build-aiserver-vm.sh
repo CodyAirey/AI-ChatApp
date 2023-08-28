@@ -17,6 +17,6 @@ rm Python-3.10.0.tgz
 export PATH="$HOME/vagrant/.local/bin:$PATH"
 /usr/local/bin/python3 -m pip install --upgrade pip
 python3 -m pip install torch --no-cache-dir --no-warn-script-location
-python3 -m pip install huggingface transformers flask gunicorn  --no-warn-script-location
+python3 -m pip install huggingface transformers flask --no-warn-script-location
 cd /vagrant
-python3 server_chat.py&
+python3 server_chat.py &
