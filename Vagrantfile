@@ -3,6 +3,20 @@ Vagrant.configure("2") do |config|
   # bit of time by using a cached copy.)
   config.vm.box = "ubuntu/focal64"
 
+	# Here is the section for defining the database server, which I have
+	# named "dbserver".
+	config.vm.define "dbserver" do |dbserver|
+		dbserver.vm.hostname = "dbserver"
+		# Note that the IP address is different from that of the webserver
+		# above: it is important that no two VMs attempt to use the same
+		# IP address on the private_network.
+		dbserver.vm.network "private_network", ip: "192.168.56.12"
+		dbserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+		
+		dbserver.vm.provision "shell", path: "build-dbserver-vm.sh"
+	end
+
+
 	config.vm.define "webserver" do |webserver|
 		# These are options specific to the webserver VM
 		webserver.vm.hostname = "webserver"
@@ -25,21 +39,10 @@ Vagrant.configure("2") do |config|
 		# may well be where markers mark your assignment.
 		webserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
 		
-		webserver.vm.provision "shell", path: "build-webserver-vm.sh"
+		webserver.vm.provision "install-webserver-vm", type: "shell", privileged: true do |s|
+			s.path = "./install-webserver-vm.sh"
+  end
 	end
-	
-	
-	# Here is the section for defining the database server, which I have
-	# named "dbserver".
-	#config.vm.define "dbserver" do |dbserver|
-	#	dbserver.vm.hostname = "dbserver"
-		# Note that the IP address is different from that of the webserver
-		# above: it is important that no two VMs attempt to use the same
-		# IP address on the private_network.
-	##	dbserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
-		
-		#dbserver.vm.provision "shell", path: "build-dbserver-vm.sh"
-	#end
 	
 	
 	#onfig.vm.define "aiserver" do |aiserver|
