@@ -1,0 +1,197 @@
+/* css variables */
+:root {
+    --spacing: 8px;
+    --rounded-corner: 20px;
+    --drop-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    --theme-primary: #1a4c87;
+    --theme-secondary: #eec217;
+}
+/* set some defaults */
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+/* main grid layout */
+body {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: min-content auto min-content;
+    grid-template-columns: 1fr;
+    justify-content: center;
+    background: #E0E0E0;
+}
+header {
+    background: var(--theme-primary);
+    text-align: center;
+    padding: 8px;
+    border-bottom: 10px solid var(--theme-secondary);
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+header h1 {
+    font-weight: bold;
+    color: white;
+    font-size: 18pt;
+    
+}
+
+/* form style */
+#message-form {
+    background: white;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+    background: var(--theme-primary);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.5);
+}
+#message-form > #message-button {
+    border-radius: var(--rounded-corner);
+    padding: 16px;
+    background: var(--theme-primary);
+    color: white;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    box-shadow: none;
+    transition: padding 0.2s;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+#message-form > #message-button:hover {
+    cursor: pointer;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    transition: padding 0.2s;
+}
+#message-text, #message-name {
+    height: 50px;
+    width: calc(100% - 80px);
+    display: block;
+    box-sizing: border-box;
+    font-size: 14pt;
+    border: none;
+    padding: 16px;
+    background: white;
+    border-radius: var(--rounded-corner);
+    box-shadow: inset var(--drop-shadow);
+}
+#message-name {
+    max-width: 12em;
+}
+
+/* style the messages */
+#chat-log-container {
+    display: flex;
+    flex-direction: column-reverse;
+    padding: var(--spacing);
+    box-shadow: inset var(--drop-shadow);
+    overflow:auto;
+}
+.message-self, .message-other {
+    position: relative;
+    max-width: 80%;
+    margin: var(--spacing) 0;
+    display: flex;
+    align-items: flex-end;
+}
+.message-self {
+    margin-left: auto;
+    flex-direction: row-reverse;
+}
+.message-other {
+    margin-right: auto;
+    flex-direction: row;
+}
+
+p.message-content {
+    padding: var(--rounded-corner);
+    border-radius: var(--rounded-corner);
+    width: fit-content;
+    background: white;
+    position: relative;
+    min-width: 90px;
+}
+p.message-content, p.sender-img {
+    filter: drop-shadow(var(--drop-shadow));
+}
+.message-other p.message-content {
+    color: var(--theme-primary);
+    background: white;
+    /* border-bottom-left-radius: 0; */
+    margin-left: 1em;
+}
+.message-self p.message-content {
+    color: white;
+    background: var(--theme-primary);
+    /* border-bottom-right-radius: 0; */
+    margin-right: 1em;
+}
+
+/* triangle for the speech bubble shape (border hack) */
+p.message-content:after {
+    content: '';
+	position: absolute;
+	bottom: var(--rounded-corner);
+	width: 0;
+	height: 0;
+	border: 12px solid transparent;
+}
+.message-other p.message-content:after {
+    border-right-color: white;
+    border-bottom: 0;
+    left: 0;
+    border-left: 0;
+	margin-left: -12px;
+}
+.message-self p.message-content:after {
+    border-left-color: var(--theme-primary);
+    border-bottom: 0;
+    right: 0;
+    border-right: 0;
+	margin-right: -12px;
+}
+
+/* message timestamp */
+p.timestamp {
+    position: absolute;
+    font-size: 0.8em;
+    bottom: 0.3em;
+    width: max-content;
+    opacity: 0.5;
+}
+.message-self > p.timestamp {
+    color: white;
+    right: 70px;
+}
+.message-other > p.timestamp {
+    color: black;
+    right: var(--rounded-corner);
+}
+
+p.sender-name {
+    position: absolute;
+    font-size: 0.8em;
+    color: #888;
+    bottom: -1.2em;
+    width: max-content;
+}
+.message-self > p.sender-name {
+    right: 5px;
+}
+.message-other > p.sender-name {
+    left: 5px;
+}
+
+p.sender-img {
+    font-size: 2em;
+    width:min-content
+}
+p.my-img {
+    margin-right: 10px;
+    font-size: 40px;
+    width:min-content;
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat App</title>
+    <link preload rel="stylesheet" href="chatapp.css">
+    <script defer src="chat-app-utils.js" ></script>
+    <script defer src="chatapp.js" ></script>
+
+</head>
+<body>
+    <header>
+        <p class="my-img">😀</p>
+        <input id="message-name" type="name" autocomplete="off" placeholder="Your name?" maxlength="20" required>
+    </header>
+
+    <main id="chat-log-container">
+        <p>No messages yet. (loading...)</p>
+    </main>
+
+    <form id="message-form">
+        <input id="message-text" type="text" autocomplete="off" placeholder="message..." data-emoji-picker="true">
+        <button id="message-button" type="submit">Send</button>
+    </form>
+</body>
+</html>
