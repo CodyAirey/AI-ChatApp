@@ -87,7 +87,7 @@ function startServer() {
     });
 
     /* reload messages every 2 seconds */
-    loadAllMessages();
+    // loadAllMessages();
 
 
 

@@ -24,5 +24,5 @@ async function loadAllMessages() {
     }
 }
 
-loadAllMessages(); // Initial load
+// loadAllMessages(); // Initial load
 // setInterval(loadAllMessages, 2000); // Refresh every 2 seconds

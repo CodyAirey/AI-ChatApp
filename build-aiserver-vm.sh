@@ -19,4 +19,4 @@ export PATH="$HOME/vagrant/.local/bin:$PATH"
 python3 -m pip install torch --no-cache-dir --no-warn-script-location
 python3 -m pip install huggingface transformers flask gunicorn  --no-warn-script-location
 cd /vagrant
-python3 server_chat.py
+python3 server_chat.py&
