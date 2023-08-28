@@ -24,6 +24,8 @@
         </p>
     </div>
 */
+
+//chat-app-utils.js
 function createMessageElement(messageClass, senderName, message, timestamp) {
     const messageBox = document.createElement('div');
     messageBox.setAttribute('class', messageClass);    
@@ -75,4 +77,4 @@ function emojiFromName(name) {
 }
 
 /* load the emoji keyboard */
-new EmojiPicker();
+// new EmojiPicker();

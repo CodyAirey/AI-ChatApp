@@ -1,3 +1,4 @@
+//server.js
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql2');
@@ -6,15 +7,10 @@ const app = express();
 
 // Serve static files
 app.use(express.static(path.join(__dirname)));
-
-// // Serve the index.html page
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'index.html'));
-// });
-
+app.use(express.urlencoded());  // To parse URL-encoded bodies
+app.use(express.json()); //To parse JSON bodies
 
 //  DB STUFF
-
 const dbConfig = {
     host: '192.168.56.12',
     user: 'webuser',
@@ -26,7 +22,7 @@ let connection;
 
 // Function to create a connection with retries
 function createConnectionWithRetries() {
-    const maxRetries = 10;
+    const maxRetries = 3;
     const retryInterval = 5000; // 5 seconds
 
     function attemptConnection(attempt) {
@@ -52,7 +48,6 @@ function createConnectionWithRetries() {
     attemptConnection(1);
 }
 
-createConnectionWithRetries();
 
 function startServer() {
 
@@ -71,6 +66,7 @@ function startServer() {
     });
 
     app.post('/send-message', (req, res) => {
+        console.log(req.body)
         const messageData = req.body;
         const query = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
         const values = [messageData.name, messageData.message, messageData.time];
@@ -87,11 +83,10 @@ function startServer() {
     });
 
     /* reload messages every 2 seconds */
-    loadAllMessages();
-
-
-
+    // loadAllMessages();
 }
+
+createConnectionWithRetries();
 
 
 const IP_ADDRESS = 'localhost'; // Change this to your desired IP address
