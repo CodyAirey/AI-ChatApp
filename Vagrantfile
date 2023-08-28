@@ -52,5 +52,6 @@ Vagrant.configure("2") do |config|
 		
 		webserver.vm.provision "build-webserver-vm", type: "shell", privileged: true do |s|
 			s.path = "./build-webserver-vm.sh"
-  end		
+		end		
+	end
 end
