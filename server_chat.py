@@ -14,13 +14,13 @@ def chat_elon():
     response = conversation.generated_responses[-1]
     return jsonify({'response': response})
 
-sarcasm = pipeline("conversational", model="abhiramtirumala/DialoGPT-sarcastic")
+microsoft = pipeline("conversational", model="microsoft/DialoGPT-medium")
 
-@app.route('/sarcasm', methods=['POST'])
+@app.route('/microsoft', methods=['POST'])
 def chat_sarcasm():
     user_input = request.json['user_input']
     conversation = Conversation(user_input)
-    conversation = sarcasm(conversation)
+    conversation = microsoft(conversation)
     response = conversation.generated_responses[-1]
     return jsonify({'response': response})
 

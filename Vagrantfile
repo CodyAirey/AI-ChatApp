@@ -48,8 +48,8 @@ Vagrant.configure("2") do |config|
 		aiserver.vm.network "private_network", ip: "192.168.56.13"
 		aiserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
 		config.vm.provider "virtualbox" do |v|
-			v.memory = 6000
-			v.cpus = 4
+			v.memory = 5500
+			v.cpus = 2
 		end
 		aiserver.vm.provision "shell", path: "build-aiserver-vm.sh"
 	end
