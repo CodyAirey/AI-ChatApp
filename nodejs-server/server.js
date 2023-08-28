@@ -7,6 +7,8 @@ const app = express();
 
 // Serve static files
 app.use(express.static(path.join(__dirname)));
+
+// stuff so messages get passed through axios 
 app.use(express.urlencoded());  // To parse URL-encoded bodies
 app.use(express.json()); //To parse JSON bodies
 
@@ -66,7 +68,6 @@ function startServer() {
     });
 
     app.post('/send-message', (req, res) => {
-        console.log(req.body)
         const messageData = req.body;
         const query = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
         const values = [messageData.name, messageData.message, messageData.time];

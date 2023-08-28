@@ -1,21 +1,8 @@
-apt-get update
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+source ~/.nvm/nvm.sh
+nvm install --lts
 
-# Install Apache and PHP
-apt-get install -y apache2
-
-# Install NVM and Node.js
-sh /vagrant/installnvm.sh
-source /vagrant/.loadbashrc
-nvm install node
-nvm use node
-npm install mysql2 express
-
-
-cd /vagrant/www
+cp -rf /vagrant/nodejs-server ~
+cd ~/nodejs-server/
+npm install mysql2 express body-parser axios
 node chatapp.js &
-
-cp /vagrant/chat-app.conf /etc/apache2/sites-available/
-a2enmod proxy
-a2ensite chat-app
-a2dissite 000-default
-service apache2 restart
