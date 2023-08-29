@@ -1,0 +1,13 @@
+[Unit]
+Description=AI Server Flask App 
+After=network.target
+
+[Service]
+User=vagrant
+Group=vagrant
+WorkingDirectory=/home/vagrant
+Environment="PATH=/usr/bin"
+ExecStart=/usr/bin/python3.10 /home/vagrant/server_chat.py
+
+[Install]
+WantedBy=multi-user.target
