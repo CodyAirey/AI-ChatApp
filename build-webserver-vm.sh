@@ -6,4 +6,7 @@ cp -r nodejs-server ~
 cd ~/nodejs-server/
 ls
 npm install mysql2 express body-parser axios
-nohup node server.js &
+npm install -g pm2
+pm2 start server.js
+pm2 save
+# nohup node server.js &
