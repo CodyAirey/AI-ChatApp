@@ -67,45 +67,66 @@ function startServer() {
         });
     });
 
-    app.post('/send-message', (req, res) => {
+    app.post('/send-message', async (req, res) => {
         const messageData = req.body;
         const query = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
         const values = [messageData.name, messageData.message, messageData.time];
-
-        // Insert message into the database using the established connection
-        connection.query(query, values, (error, results) => {
+    
+        // Insert user message into the database
+        connection.query(query, values, async (error, results) => {
             if (error) {
                 console.error(error);
-                res.status(500).send('Error inserting message into the database.');
-            } else {
-
-                // Start convo with AI Server:
-                const base_url = "http://192.168.56.13:5000/";
-
-                // pick an AI responder
-                const elon = "elon";
-                const microsoft = "microsoft";
-                let chatter = elon;
-                if (Math.random() < 0.5) chatter = microsoft;
-
-                let url = base_url + chatter;
-
-                axios.post(url, { user_input: messageData.message }, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then((response) => {
-                    console.log(chatter + ":", response.data.response);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-
-                res.send('Message inserted successfully.');
+                return res.status(500).send('Error inserting message into the database.');
             }
+    
+            // Start conversation with AI Server
+            const base_url = "http://192.168.56.13:5000/";
+    
+            // List of AI responders
+            const aiResponders = ["elon", "microsoft"]; // Add more responders as needed
+            let currentResponderIndex = Math.floor(Math.random() * aiResponders.length);
+            let continueConversation = true;
+            let chance = 1.0; // Initial chance of continuing the conversation
+    
+            while (continueConversation) {
+                const currentResponder = aiResponders[currentResponderIndex];
+                let url = base_url + currentResponder;
+    
+                try {
+                    const aiResponse = await axios.post(url, { user_input: messageData.message }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+    
+                    // Insert AI response into the database
+                    const aiQuery = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
+                    const aiValues = [currentResponder, aiResponse.data.response, new Date().getTime()];
+                    connection.query(aiQuery, aiValues, (aiError, aiResults) => {
+                        if (aiError) {
+                            console.error(aiError);
+                        } else {
+                            console.log(currentResponder + " (AI):", aiResponse.data.response);
+                        }
+                    });
+    
+                    // Update the currentResponderIndex for the next iteration
+                    currentResponderIndex = (currentResponderIndex + 1) % aiResponders.length;
+    
+                    // Decrease the chance of continuing the conversation
+                    chance -= 0.2; // You can adjust the decrement value as needed
+    
+                    // Decide whether to continue the conversation based on chance
+                    continueConversation = Math.random() < chance;
+    
+                } catch (error) {
+                    console.error(error);
+                    continueConversation = false; // Stop the conversation on error
+                }
+            }
+    
+            res.send('Message inserted successfully.');
         });
-
     });
 
     /* reload messages every 2 seconds */

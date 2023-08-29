@@ -59,6 +59,10 @@ async function submitNewMessage() {
     try {
         const response = await axios.post('/send-message', body, config);
         console.log(response.data); // Assuming the server responds with some data
+        if (response.data === 'Message inserted successfully.') {
+            // After AI message insertion, refresh messages
+            loadAllMessages();
+        }
     } catch (error) {
         console.error("Error:", error);
     }
