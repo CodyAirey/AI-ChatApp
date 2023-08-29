@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
 
 		# This following line is only necessary in the CS Labs... but that
 		# may well be where markers mark your assignment.
-		webserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+		webserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=777,fmode=777"]
 		
 		webserver.vm.provision "build-webserver-vm", type: "shell", privileged: true do |s|
 			s.path = "./build-webserver-vm.sh"

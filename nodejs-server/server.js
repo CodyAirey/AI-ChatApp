@@ -90,7 +90,7 @@ function startServer() {
 createConnectionWithRetries();
 
 
-const IP_ADDRESS = 'localhost'; // Change this to your desired IP address
+const IP_ADDRESS = "192.168.56.11"; // Change this to your desired IP address
 const PORT = 8080;
 app.listen(PORT, IP_ADDRESS, () => {
     console.log(`Server running at http://${IP_ADDRESS}:${PORT}/`);
