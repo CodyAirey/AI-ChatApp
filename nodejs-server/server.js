@@ -78,9 +78,34 @@ function startServer() {
                 console.error(error);
                 res.status(500).send('Error inserting message into the database.');
             } else {
+
+                // Start convo with AI Server:
+                const base_url = "http://192.168.56.13:5000/";
+
+                // pick an AI responder
+                const elon = "elon";
+                const microsoft = "microsoft";
+                let chatter = elon;
+                if (Math.random() < 0.5) chatter = microsoft;
+
+                let url = base_url + chatter;
+
+                axios.post(url, { user_input: messageData.message }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then((response) => {
+                    console.log(chatter + ":", response.data.response);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
                 res.send('Message inserted successfully.');
             }
         });
+
     });
 
     /* reload messages every 2 seconds */
