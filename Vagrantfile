@@ -2,6 +2,7 @@ Vagrant.configure("2") do |config|
   # (We have used this box previously, so reusing it here should save a
   # bit of time by using a cached copy.)
   config.vm.box = "ubuntu/focal64"
+  config.vm.boot_timeout = 600
 
 	config.vm.define "aiserver" do |aiserver|
 		aiserver.vm.hostname = "aiserver"
