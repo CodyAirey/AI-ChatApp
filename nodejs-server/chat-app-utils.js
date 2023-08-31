@@ -75,6 +75,3 @@ function emojiFromName(name) {
     let e = generateHash(name) % emojis.length;
     return emojis[e];
 }
-
-/* load the emoji keyboard */
-// new EmojiPicker();

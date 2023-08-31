@@ -1,15 +1,16 @@
-// client.js
-
+// Function to load all messages from the server and display them
 async function loadAllMessages() {
     try {
         const response = await axios.get('/messages'); // Use a relative path to the server route
         const messages = response.data;
 
+        // Clear the chat container
         let chatContainer = document.getElementById("chat-log-container");
         chatContainer.innerHTML = '';
 
         let className;
 
+        // Loop through messages and create message elements
         messages.forEach(e => {
             if (e.name === userName) {
                 className = "message-self";
@@ -23,17 +24,17 @@ async function loadAllMessages() {
     }
 }
 
-/* this function sends a new message to the server */
+// Function to submit a new message to the server
 async function submitNewMessage() {
-    if (userName == "") return; // if no userName, stop
+    if (userName == "") return; // If no userName, stop
 
-    /* get input form data */
+    /* Get input form data */
     const msgInput = document.querySelector('#message-text');
-    if (msgInput.value == "") return; // if no message, stop
+    if (msgInput.value == "") return; // If no message, stop
     const message = msgInput.value;
-    msgInput.value = ""; // clear the input form
+    msgInput.value = ""; // Clear the input form
 
-    /* create local message element on the page */
+    /* Create local message element on the page */
     createMessageElement(
         "message-self",
         userName,
@@ -41,7 +42,7 @@ async function submitNewMessage() {
         new Date().getTime()
     );
 
-    /* POST messageData to the server using Axios */
+    /* Prepare messageData to send to the server using Axios */
     const messageData = {
         "name": userName,
         "message": message,
@@ -54,7 +55,7 @@ async function submitNewMessage() {
         headers: {
           'Content-Type': 'application/JSON'
         }
-      };
+    };
 
     try {
         const response = await axios.post('/send-message', body, config);
@@ -68,24 +69,24 @@ async function submitNewMessage() {
     }
 }
 
-
-
-/* form submission event handler */
+// Form submission event handler
 function clickHandler(event) {
     event.preventDefault();
     submitNewMessage();
 }
 document.querySelector("#message-button").addEventListener('click', clickHandler);
 
-let userName = ""
-/* whenever the user types their name, change emoji, save name in localStorage */
+let userName = "";
+
+// Event listener for user name input
 document.querySelector("#message-name").addEventListener('input', function() {
     const name = document.querySelector("#message-name").value;
     document.querySelector("p.my-img").textContent = emojiFromName(name);
     userName = name;
     localStorage.setItem("userName", userName);
 });
-/* on page load, get userName from localStorage */
+
+// On page load, retrieve userName from localStorage
 if(localStorage.getItem("userName") !== null) {
     userName = localStorage.getItem("userName");
     document.querySelector("#message-name").value = userName;

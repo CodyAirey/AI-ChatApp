@@ -22,7 +22,7 @@ const dbConfig = {
 
 let connection;
 
-// Function to create a connection with retries
+// Function to create a connection to DB with retries
 function createConnectionWithRetries() {
     const maxRetries = 3;
     const retryInterval = 5000; // 5 seconds
@@ -67,34 +67,42 @@ function startServer() {
         });
     });
 
+    // Handle POST request to send a message
     app.post('/send-message', async (req, res) => {
+        // Extract message data from the request body
         const messageData = req.body;
+
+        // Define the SQL query and parameter values for message insertion
         const query = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
         const values = [messageData.name, messageData.message, messageData.time];
-    
+
         // Insert user message into the database
         connection.query(query, values, async (error, results) => {
             if (error) {
                 console.error(error);
                 return res.status(500).send('Error inserting message into the database.');
             }
-    
+
             // Start conversation with AI Server
             const base_url = "http://192.168.56.13:5000/";
-            
+
+            // Fetch available AI responders from AI Server
             const respondersResponse = await axios.post(base_url + "available_responders");
             const aiResponders = respondersResponse.data.response;
 
-            // List of AI responders
+            // Initialize variables for conversation loop
             let currentResponderIndex = Math.floor(Math.random() * aiResponders.length);
             let continueConversation = true;
             let chance = 1.0; // Initial chance of continuing the conversation
-    
+
+            // Conduct a 'conversation' with AI responders
             while (continueConversation) {
+                // Get the current AI responder
                 const currentResponder = aiResponders[currentResponderIndex];
                 let url = base_url + currentResponder;
-    
+
                 try {
+                    // Send a request to the current AI responder
                     const aiResponse = await axios.post(url);
 
                     if (aiResponse.status === 200) {
@@ -102,6 +110,7 @@ function startServer() {
                         currentResponderIndex = (currentResponderIndex + 1) % aiResponders.length;
                         // Decrease the chance of continuing the conversation
                         chance -= 0.2;
+                        // Randomly decide if the conversation should continue
                         continueConversation = Math.random() < chance;
                     } else {
                         console.error('POST request failed');
@@ -112,19 +121,17 @@ function startServer() {
                     continueConversation = false; // Stop the conversation on error
                 }
             }
-    
+
+            // Send a response indicating successful message insertion
             res.send('Message inserted successfully.');
         });
     });
-
-    /* reload messages every 2 seconds */
-    // loadAllMessages();
 }
 
 createConnectionWithRetries();
 
 
-const IP_ADDRESS = "192.168.56.11"; // Change this to your desired IP address
+const IP_ADDRESS = "192.168.56.11";
 const PORT = 8080;
 app.listen(PORT, IP_ADDRESS, () => {
     console.log(`Server running at http://${IP_ADDRESS}:${PORT}/`);
