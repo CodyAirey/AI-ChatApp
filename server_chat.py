@@ -42,11 +42,11 @@ def createConnectionWithRetries():
     attemptConnection(1)
 
 
-def get_top_5_messages():
+def get_top_6_messages():
     global connection
     try:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT * FROM messages ORDER BY id DESC LIMIT 5"
+            sql = "SELECT * FROM messages ORDER BY id DESC LIMIT 6"
             cursor.execute(sql)
             result = cursor.fetchall()
         return result
@@ -69,7 +69,7 @@ def insert_message(name, message):
 
 @app.route(f'/get_db', methods=['POST'])
 def get_db_route():
-    success = get_top_5_messages()
+    success = get_top_6_messages()
     if success:
         return jsonify(success), 200
     else:
@@ -99,15 +99,14 @@ def chat_responder2():
     else:
         return jsonify({'error': e}), 500
 
-
-
 def chat_with_responder(responder_name):
-    
     try:
-        user_input = request.json['user_input']
         
-        # Get the 5 most recent messages from the database
-        recent_messages = get_top_5_messages()
+        # Get the 6 most recent messages from the database
+        recent_messages = get_top_6_messages()
+        
+        # Extract the most recent message from the recent_messages list
+        most_recent_message = recent_messages.pop(0)['message'] if recent_messages else ''
         
         # Separate the user inputs and generated responses into two separate lists
         past_user_inputs = [msg['message'] for msg in recent_messages if msg['name'] != responder_name]
@@ -115,21 +114,26 @@ def chat_with_responder(responder_name):
         
         # Create a Conversation object with the past conversation history
         conversation = Conversation(past_user_inputs=past_user_inputs, generated_responses=generated_responses)
-        # Append the user input to the conversation
-        conversation.add_user_input(user_input)
+        
+        # Append the most recent user input to the conversation
+        conversation.add_user_input(most_recent_message)
+        
         # Get the response from the model
         if responder_name == responders[0]:
             conversation = responder1(conversation)
         elif responder_name == responders[1]:
             conversation = responder2(conversation)
         response = conversation.generated_responses[-1]
+        
         # Append the model response to the generated_responses list
         generated_responses.append(response)
-        insert_message(responder_name,response)
+        insert_message(responder_name, response)
+        
         return True, "no error"
     except Exception as e:
         logger.error(f"Error in chat_with_responder: {e}")
         return False, e
+
 
     
 
