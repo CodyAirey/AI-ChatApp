@@ -6,7 +6,13 @@ cp -r nodejs-server /home/vagrant
 cd /home/vagrant/nodejs-server/
 ls
 npm install mysql2 express body-parser axios
-npm install -g pm2
-pm2 start server.js
-pm2 save
+sudo cp /vagrant/nodejs-server/node_chat_server.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl start node_chat_server
+sudo systemctl enable node_chat_server
+sudo systemctl status node_chat_server
+
+# npm install -g pm2
+# pm2 start server.js
+# pm2 save
 # pm2 logs server

@@ -1,0 +1,13 @@
+[Unit]
+Description=Node Chat Server
+After=network.target
+
+[Service]
+User=vagrant
+Group=vagrant
+WorkingDirectory=/home/vagrant/nodejs-server
+Environment="PATH=/home/vagrant/.nvm/versions/node/v18.17.1/bin/"
+ExecStart=/home/vagrant/.nvm/versions/node/v18.17.1/bin/node server.js
+
+[Install]
+WantedBy=multi-user.target
