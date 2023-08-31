@@ -1,4 +1,5 @@
 ### Authors: Cody Airey, Jake Norton
+
 # AI Chat Application
 
 ## Overview
@@ -8,7 +9,6 @@ Welcome to our Vagrant configuration repository, designed to set up and manage t
 ### Disclaimer
 
 While we've made efforts to create an entertaining and engaging chat experience, it's important to acknowledge that AI-generated responses might not always align with a typical conversation. Some responses may be nonsensical or even occasionally inappropriate. We've taken precautions to avoid models that promote hateful or offensive content, but unforeseen outputs are still possible. We encourage users to engage with the AI chat responsibly and maintain a friendly environment.
-
 
 ### Structure
 
@@ -22,25 +22,36 @@ While we've made efforts to create an entertaining and engaging chat experience,
 <br>
 
 2. **Database VM** - Manages the MySQL database for message storage
+
    - Contains a single, simple table to store message data.
    - The table structure includes fields for name, message, and timestamp.
    - Default Static IP: 192.168.56.12
 
-    ```sql
-    CREATE TABLE messages (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255),
-        message TEXT,
-        time BIGINT
-    );
-    ```
+   ```sql
+   CREATE TABLE messages (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       name VARCHAR(255),
+       message TEXT,
+       time BIGINT
+   );
+   ```
 
 <br>
 
 3. **AI Server VM** - Hosts a Python Flask server with conversational AI models
    - Two AI models are loaded upon boot.
    - Interacting with the models is as simple as sending an HTTP POST request.
-
+   - The AI Responders are huggingface conversational models https://huggingface.co/models?pipeline_tag=conversational&sort=trending
+   - Most models from the conversational section will just work if you switch out to the model name, bare in mind that they come in different sizes
+   - Since the routing for a responder is dynamic, you can easily add more by including another Hugging Face model in the responders array of the [server_chat.py](server_chat.py) file. 
+   
+   For example:
+   ```
+   {"name": "Harry", "model": "Aran/DialoGPT-small-harrypotter"}
+   ```
+   - Update the RAM and disk space allowed in the Vagrant file as needed (some models are quite large).
+   - Quick reload can be done by with `sudo systemctl restart aiflask` ensuring you have updated the copy at `/home/vagrant/server_chat.py` 
+   - There is a file `~/app.log` which contains the log from the flask server. This will show any HTTP requests as well as error messages if something goes wrong.
 
 ## License
 
