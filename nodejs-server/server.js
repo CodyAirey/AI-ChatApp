@@ -81,9 +81,11 @@ function startServer() {
     
             // Start conversation with AI Server
             const base_url = "http://192.168.56.13:5000/";
-    
+            
+            const respondersResponse = await axios.post(base_url + "available_responders");
+            const aiResponders = respondersResponse.data.response;
+
             // List of AI responders
-            const aiResponders = ["elon", "microsoft"]; // Add more responders as needed
             let currentResponderIndex = Math.floor(Math.random() * aiResponders.length);
             let continueConversation = true;
             let chance = 1.0; // Initial chance of continuing the conversation
@@ -93,32 +95,18 @@ function startServer() {
                 let url = base_url + currentResponder;
     
                 try {
-                    const aiResponse = await axios.post(url, { user_input: messageData.message }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-    
-                    // Insert AI response into the database
-                    const aiQuery = 'INSERT INTO messages (name, message, time) VALUES (?, ?, ?)';
-                    const aiValues = [currentResponder, aiResponse.data.response, new Date().getTime()];
-                    connection.query(aiQuery, aiValues, (aiError, aiResults) => {
-                        if (aiError) {
-                            console.error(aiError);
-                        } else {
-                            console.log(currentResponder + " (AI):", aiResponse.data.response);
-                        }
-                    });
-    
-                    // Update the currentResponderIndex for the next iteration
-                    currentResponderIndex = (currentResponderIndex + 1) % aiResponders.length;
-    
-                    // Decrease the chance of continuing the conversation
-                    chance -= 0.2; // You can adjust the decrement value as needed
-    
-                    // Decide whether to continue the conversation based on chance
-                    continueConversation = Math.random() < chance;
-    
+                    const aiResponse = await axios.post(url);
+
+                    if (aiResponse.status === 200) {
+                        // Update the currentResponderIndex for the next iteration
+                        currentResponderIndex = (currentResponderIndex + 1) % aiResponders.length;
+                        // Decrease the chance of continuing the conversation
+                        chance -= 0.2;
+                        continueConversation = Math.random() < chance;
+                    } else {
+                        console.error('POST request failed');
+                        continueConversation = false;
+                    }
                 } catch (error) {
                     console.error(error);
                     continueConversation = false; // Stop the conversation on error

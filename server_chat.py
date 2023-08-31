@@ -15,7 +15,7 @@ dbConfig = {
     'database': 'fvision'
 }
 connection = None
-responders = ["elon", "PygmalionAI"]
+responders = ["Elon", "DwightSchrute"]
 # Function to create a connection with retries
 responder1 = pipeline("conversational", model="Pi3141/DialoGPT-medium-elon-3")
 responder2 = pipeline("conversational", model="abjbpi/Dwight_Schrute")
@@ -42,11 +42,11 @@ def createConnectionWithRetries():
     attemptConnection(1)
 
 
-def get_top_6_messages():
+def get_top_5_messages():
     global connection
     try:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT * FROM messages ORDER BY id DESC LIMIT 6"
+            sql = "SELECT * FROM messages ORDER BY id DESC LIMIT 5"
             cursor.execute(sql)
             result = cursor.fetchall()
         return result
@@ -69,7 +69,7 @@ def insert_message(name, message):
 
 @app.route(f'/get_db', methods=['POST'])
 def get_db_route():
-    success = get_top_6_messages()
+    success = get_top_5_messages()
     if success:
         return jsonify(success), 200
     else:
@@ -103,7 +103,7 @@ def chat_with_responder(responder_name):
     try:
         
         # Get the 6 most recent messages from the database
-        recent_messages = get_top_6_messages()
+        recent_messages = get_top_5_messages()
         
         # Extract the most recent message from the recent_messages list
         most_recent_message = recent_messages.pop(0)['message'] if recent_messages else ''
