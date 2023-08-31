@@ -84,7 +84,7 @@ function startServer() {
             }
 
             // Start conversation with AI Server
-            const base_url = "http://192.168.56.13:5000/";
+            const base_url = "http://192.168.56.13:5000/chat/";
 
             // Fetch available AI responders from AI Server
             const respondersResponse = await axios.post(base_url + "available_responders");

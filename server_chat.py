@@ -15,10 +15,18 @@ dbConfig = {
     'database': 'fvision'
 }
 connection = None
-responders = ["Elon", "DwightSchrute"]
-# Function to create a connection with retries
-responder1 = pipeline("conversational", model="Pi3141/DialoGPT-medium-elon-3")
-responder2 = pipeline("conversational", model="abjbpi/Dwight_Schrute")
+
+# Update responders list with dictionaries containing responder information
+responders = [
+    {"name": "Elon", "model": "Pi3141/DialoGPT-medium-elon-3"},
+    {"name": "DwightSchrute", "model": "abjbpi/Dwight_Schrute"}
+]
+
+# Create a dictionary to map responder names to pipeline objects
+responder_pipelines = {
+    responder["name"]: pipeline("conversational", model=responder["model"])
+    for responder in responders
+}
 
 def createConnectionWithRetries():
     maxRetries = 100
@@ -82,65 +90,46 @@ def add_messages():
     insert_message("Jake", user_input)
     return jsonify({'status': 'success'})
 
-@app.route(f'/{responders[0]}', methods=['POST'])
-def chat_responder1():
-    success, e = chat_with_responder(responders[0])
-    if success:
-        return jsonify({'status': 'success'}), 200
-    else:
-        return jsonify({'error': e}), 500
 
-
-@app.route(f'/{responders[1]}', methods=['POST'])
-def chat_responder2():
-    success, e = chat_with_responder(responders[1])
-    if success:
-        return jsonify({'status': 'success'}), 200
-    else:
-        return jsonify({'error': e}), 500
-
+@app.route('/chat/<responder_name>', methods=['POST'])
 def chat_with_responder(responder_name):
-    try:
-        
-        # Get the 6 most recent messages from the database
-        recent_messages = get_top_5_messages()
-        
-        # Extract the most recent message from the recent_messages list
-        most_recent_message = recent_messages.pop(0)['message'] if recent_messages else ''
-        
-        # Separate the user inputs and generated responses into two separate lists
-        past_user_inputs = [msg['message'] for msg in recent_messages if msg['name'] != responder_name]
-        generated_responses = [msg['message'] for msg in recent_messages if msg['name'] == responder_name]
-        
-        # Create a Conversation object with the past conversation history
-        conversation = Conversation(past_user_inputs=past_user_inputs, generated_responses=generated_responses)
-        
-        # Append the most recent user input to the conversation
-        conversation.add_user_input(most_recent_message)
-        
-        # Get the response from the model
-        if responder_name == responders[0]:
-            conversation = responder1(conversation)
-        elif responder_name == responders[1]:
-            conversation = responder2(conversation)
-        response = conversation.generated_responses[-1]
-        
-        # Append the model response to the generated_responses list
-        generated_responses.append(response)
-        insert_message(responder_name, response)
-        
-        return True, "no error"
-    except Exception as e:
-        logger.error(f"Error in chat_with_responder: {e}")
-        return False, e
+    if responder_name in responder_pipelines:
+        try:
+            # Get the 5 most recent messages from the database
+            recent_messages = get_top_5_messages()
+
+            # Extract the most recent message from the recent_messages list
+            most_recent_message = recent_messages.pop(0)['message'] if recent_messages else ''
+
+            # Separate the user inputs and generated responses into two separate lists
+            past_user_inputs = [msg['message'] for msg in recent_messages if msg['name'] != responder_name]
+            generated_responses = [msg['message'] for msg in recent_messages if msg['name'] == responder_name]
+
+            # Create a Conversation object with the past conversation history
+            conversation = Conversation(past_user_inputs=past_user_inputs, generated_responses=generated_responses)
+
+            # Append the most recent user input to the conversation
+            conversation.add_user_input(most_recent_message)
+
+            # Get the response from the model using the appropriate pipeline
+            conversation = responder_pipelines[responder_name](conversation)
+            response = conversation.generated_responses[-1]
+
+            # Append the model response to the generated_responses list
+            generated_responses.append(response)
+            insert_message(responder_name, response)
+
+            return jsonify({'status': 'success'}), 200
+        except Exception as e:
+            logger.error(f"Error in chat_with_responder: {e}")
+            return jsonify({'error': str(e)}), 500
+    else:
+        return jsonify({'error': 'Invalid responder name'}), 400
 
 
-    
-
-
-@app.route('/available_responders', methods=['POST'])
+@app.route('/chat/available_responders', methods=['POST'])
 def send_available_responders():
-    return jsonify({'response': responders})
+    return jsonify({'response': [responder["name"] for responder in responders]})
 
 
 if __name__ == '__main__':
