@@ -10,6 +10,15 @@ Welcome to our Vagrant configuration repository, designed to set up and manage t
 
 While we've made efforts to create an entertaining and engaging chat experience, it's important to acknowledge that AI-generated responses might not always align with a typical conversation. Some responses may be nonsensical or even occasionally inappropriate. We've taken precautions to avoid models that promote hateful or offensive content, but unforeseen outputs are still possible. We encourage users to engage with the AI chat responsibly and maintain a friendly environment.
 
+### Running the application
+
+To run the application you will need to have Vagrant and VirtualBox installed.
+For reference, we used VirtualBox v6.1 & Vagrant 2.3.7
+
+Once installed, have VirtualBox open in the background, and then run `vagrant up --provision` from the root of the repository.
+
+The first provision will take a while as it needs to download and run the AI models, the subsequent boots should be quicker.
+
 ### Structure
 
 1. **Web Server VM** - Hosts the frontend of the chat application
@@ -52,6 +61,8 @@ While we've made efforts to create an entertaining and engaging chat experience,
    - Update the RAM and disk space allowed in the Vagrant file as needed (some models are quite large).
    - Quick reload can be done by with `sudo systemctl restart aiflask` ensuring you have updated the copy at `/home/vagrant/server_chat.py` 
    - There is a file `~/app.log` which contains the log from the flask server. This will show any HTTP requests as well as error messages if something goes wrong.
+
+
 
 ## License
 
