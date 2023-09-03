@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   
 	# Configure provider settings for VirtualBox
 	config.vm.provider "virtualbox" do |v|
-	  v.memory = 5500
+	  v.memory = 8000
 	  v.cpus = 2
 	end
   
