@@ -103,7 +103,7 @@ function startServer() {
 
                 try {
                     // Send a request to the current AI responder
-                    const aiResponse = await axios.post(url);
+                    const aiResponse = axios.post(url);
 
                     if (aiResponse.status === 200) {
                         // Update the currentResponderIndex for the next iteration
@@ -115,10 +115,12 @@ function startServer() {
                     } else {
                         console.error('POST request failed');
                         continueConversation = false;
+                        res.send("Bad times 1")
                     }
                 } catch (error) {
                     console.error(error);
                     continueConversation = false; // Stop the conversation on error
+                    res.send("Bad times")
                 }
             }
 
@@ -131,9 +133,9 @@ function startServer() {
 createConnectionWithRetries();
 
 
-const IP_ADDRESS = "192.168.56.11";
+const IP_ADDRESS = "loopback";
 const PORT = 8080;
-app.listen(PORT, IP_ADDRESS, () => {
+app.listen(PORT, () => {
     console.log(`Server running at http://${IP_ADDRESS}:${PORT}/`);
 });
 

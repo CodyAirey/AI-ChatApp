@@ -1,6 +1,6 @@
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 source ~/.nvm/nvm.sh
-nvm install --lts
+nvm install 18.17.1
 cd /vagrant
 cp -r nodejs-server /home/vagrant
 cd /home/vagrant/nodejs-server/
