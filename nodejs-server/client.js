@@ -93,4 +93,5 @@ if(localStorage.getItem("userName") !== null) {
     document.querySelector("p.my-img").textContent = emojiFromName(userName);
 }
 
+setInterval(loadAllMessages, 5000);
 loadAllMessages(); // Initial load

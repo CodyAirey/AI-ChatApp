@@ -103,7 +103,7 @@ function startServer() {
 
                 try {
                     // Send a request to the current AI responder
-                    const aiResponse = axios.post(url);
+                    const aiResponse = await axios.post(url);
 
                     if (aiResponse.status === 200) {
                         // Update the currentResponderIndex for the next iteration
